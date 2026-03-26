@@ -45,11 +45,7 @@ export class EnvSync implements IEnvSync {
     return response.json();
   }
 
-  async setVar(
-    extensionId: string,
-    key: string,
-    value: string
-  ): Promise<void> {
+  async setVar(extensionId: string, key: string, value: string): Promise<void> {
     await this._request(this._url(encodeURIComponent(key)), 'PUT', {
       extension_id: extensionId,
       value
@@ -93,10 +89,7 @@ export class EnvSync implements IEnvSync {
     }
   }
 
-  private async _propagate(
-    key: string,
-    value: string | null
-  ): Promise<void> {
+  private async _propagate(key: string, value: string | null): Promise<void> {
     await injectIntoAllKernels(this._serviceManager, key, value);
     await restartTerminals(this._serviceManager);
   }

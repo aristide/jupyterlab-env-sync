@@ -39,20 +39,24 @@ const plugin: JupyterFrontEndPlugin<void> = {
   autoStart: true,
   requires: [IEnvSync],
   activate: async (app: JupyterFrontEnd, envSync: IEnvSync) => {
-    await envSync.setVar('my-extension', 'DATABASE_URL', 'postgres://localhost/mydb');
+    await envSync.setVar(
+      'my-extension',
+      'DATABASE_URL',
+      'postgres://localhost/mydb'
+    );
   }
 };
 ```
 
 ### Methods
 
-| Method | Signature | Description |
-|--------|-----------|-------------|
-| `setVar` | `(extId, key, value) → Promise<void>` | Set a variable. Propagates to all kernels and restarts terminals. |
-| `resetVar` | `(extId, key, force?) → Promise<void>` | Reset to spawner value. Only the owner can reset unless `force=true`. |
-| `getAll` | `() → Promise<Record<string, IEnvEntry>>` | All overrides with metadata (value, spawner_value, set_by, set_at). |
-| `getByExtension` | `(extId) → Promise<Record<string, string>>` | Variables owned by a specific extension (key-value pairs). |
-| `resetAllByExtension` | `(extId) → Promise<void>` | Reset all variables owned by an extension. |
+| Method                | Signature                                   | Description                                                           |
+| --------------------- | ------------------------------------------- | --------------------------------------------------------------------- |
+| `setVar`              | `(extId, key, value) → Promise<void>`       | Set a variable. Propagates to all kernels and restarts terminals.     |
+| `resetVar`            | `(extId, key, force?) → Promise<void>`      | Reset to spawner value. Only the owner can reset unless `force=true`. |
+| `getAll`              | `() → Promise<Record<string, IEnvEntry>>`   | All overrides with metadata (value, spawner_value, set_by, set_at).   |
+| `getByExtension`      | `(extId) → Promise<Record<string, string>>` | Variables owned by a specific extension (key-value pairs).            |
+| `resetAllByExtension` | `(extId) → Promise<void>`                   | Reset all variables owned by an extension.                            |
 
 ### Consumer `package.json`
 

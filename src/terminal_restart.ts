@@ -32,14 +32,11 @@ export async function restartTerminals(
     }
   }
 
-  for (const _ of names) {
+  for (let i = 0; i < names.length; i++) {
     try {
       await terminalManager.startNew();
     } catch (err) {
-      console.error(
-        'jupyterlab-env-sync: failed to start new terminal:',
-        err
-      );
+      console.error('jupyterlab-env-sync: failed to start new terminal:', err);
     }
   }
 }

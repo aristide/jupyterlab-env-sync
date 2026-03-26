@@ -22,9 +22,7 @@ describe('buildSnippet', () => {
   describe('r', () => {
     it('should generate set snippet', () => {
       const code = buildSnippet('r', 'DB_URL', 'postgres://localhost');
-      expect(code).toBe(
-        'Sys.setenv("DB_URL" = "postgres://localhost")'
-      );
+      expect(code).toBe('Sys.setenv("DB_URL" = "postgres://localhost")');
     });
 
     it('should generate unset snippet', () => {
