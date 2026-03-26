@@ -2,16 +2,19 @@ import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin
 } from '@jupyterlab/application';
+import { IEnvSync } from './tokens';
+import { EnvSync } from './env_sync';
 
-/**
- * Initialization data for the jupyterlab-env-sync extension.
- */
-const plugin: JupyterFrontEndPlugin<void> = {
+const plugin: JupyterFrontEndPlugin<IEnvSync> = {
   id: 'jupyterlab-env-sync:plugin',
   autoStart: true,
-  activate: (app: JupyterFrontEnd) => {
-    console.log('JupyterLab extension jupyterlab-env-sync is activated!');
+  provides: IEnvSync,
+  activate: (app: JupyterFrontEnd): IEnvSync => {
+    console.log('jupyterlab-env-sync: extension activated');
+    return new EnvSync(app);
   }
 };
 
 export default plugin;
+export { IEnvSync } from './tokens';
+export type { IEnvEntry } from './tokens';

@@ -60,8 +60,6 @@ jobs:
     name: Publish python package
     needs: build-release
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
 
     steps:
       - name: Checkout
@@ -83,4 +81,5 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.PYPI_TOKEN }}
+          repository-url: https://upload.pypi.org/legacy/
           skip-existing: true

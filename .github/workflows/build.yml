@@ -48,6 +48,11 @@ jobs:
         jupyter labextension list 2>&1 | sed 's/\x1b\[[0-9;]*m//g' | grep -ie "jupyterlab-env-sync.*ok"
         python -m jupyterlab.browser_check
 
+    - name: Test the server extension
+      run: |
+        set -eux
+        python -m pytest jupyterlab-env-sync/tests/ -v
+
     - name: Package the extension
       run: |
         set -eux
