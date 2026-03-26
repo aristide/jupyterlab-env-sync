@@ -1,0 +1,8 @@
+{
+  "jupyter.lab.shortcuts": [],
+  "title": "jupyterlab-env-sync",
+  "description": "jupyterlab-env-sync settings.",
+  "type": "object",
+  "properties": {},
+  "additionalProperties": false
+}

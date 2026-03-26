@@ -1,0 +1,164 @@
+name: Build
+
+on:
+  push:
+    branches: master
+  pull_request:
+    branches: '*'
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Base Setup
+      uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+
+    - name: Install dependencies
+      run: python -m pip install -U "jupyterlab>=4.0.0,<5"
+
+    - name: Install node dependencies
+      run: jlpm
+
+    - name: Lint the extension
+      run: |
+        set -eux
+        jlpm run lint:check
+
+    - name: Test the extension
+      run: |
+        set -eux
+        jlpm run test
+
+    - name: Build and install the extension
+      run: |
+        set -eux
+
+        # Clean any pre-existing labextension build so hatch-jupyter-builder
+        # runs the full build during pip install
+        rm -rf jupyterlab-env-sync/labextension
+
+        python -m pip install ".[test]"
+
+        jupyter labextension list
+        jupyter labextension list 2>&1 | sed 's/\x1b\[[0-9;]*m//g' | grep -ie "jupyterlab-env-sync.*ok"
+        python -m jupyterlab.browser_check
+
+    - name: Package the extension
+      run: |
+        set -eux
+
+        pip install build
+        python -m build
+        pip uninstall -y "jupyterlab-env-sync" jupyterlab
+
+    - name: upload python build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist
+        path: dist
+        retention-days: 5
+
+    - name: upload typescript build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: lib
+        path: lib
+        retention-days: 5
+
+    - name: Upload extension packages
+      uses: actions/upload-artifact@v4
+      with:
+        name: extension-artifacts
+        path: dist/jupyterlab_env_sync*
+        if-no-files-found: error
+        retention-days: 5
+
+  test-isolated:
+    name: Test isolated
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Install Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        architecture: 'x64'
+    - uses: actions/download-artifact@v4
+      with:
+        name: extension-artifacts
+    - name: Install and Test
+      run: |
+        set -eux
+        # Remove NodeJS, twice to take care of system and locally installed node versions.
+        sudo rm -rf $(which node)
+        sudo rm -rf $(which node)
+
+        pip install "jupyterlab>=4.0.0,<5" jupyterlab_env_sync*.whl
+
+        jupyter labextension list
+        jupyter labextension list 2>&1 | sed 's/\x1b\[[0-9;]*m//g' | grep -ie "jupyterlab-env-sync.*ok"
+        python -m jupyterlab.browser_check --no-chrome-test
+
+  integration-tests:
+    name: Integration tests
+    needs: test-isolated
+    runs-on: ubuntu-latest
+
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/pw-browsers
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Base Setup
+      uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+
+    - name: Download extension package
+      uses: actions/download-artifact@v4
+      with:
+        name: extension-artifacts
+
+    - name: Install the extension
+      run: |
+        set -eux
+        python -m pip install "jupyterlab>=4.0.0,<5" jupyterlab_env_sync*.whl
+
+    - name: Install dependencies
+      working-directory: ui-tests
+      env:
+        PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+      run: jlpm install
+
+    - name: Set up browser cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          ${{ github.workspace }}/pw-browsers
+        key: ${{ runner.os }}-${{ hashFiles('ui-tests/yarn.lock') }}
+
+    - name: Install browser
+      run: npx playwright install chromium
+      working-directory: ui-tests
+
+    - name: Execute integration tests
+      working-directory: ui-tests
+      run: |
+        npx playwright test
+
+    - name: Upload Playwright Test report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: jupyterlab-env-sync-playwright-tests
+        path: |
+          ui-tests/test-results
+          ui-tests/playwright-report
