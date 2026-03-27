@@ -2,6 +2,17 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 1.1.0
+
+### Enhancements
+
+- **npm publishing with provenance** — added `publish-npm` job to the release workflow that publishes the package to npm with SLSA provenance attestation (`--provenance`)
+- **Updated `publishConfig`** — added `"provenance": true` to `package.json` for signed build attestations
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
+<!-- <START NEW CHANGELOG ENTRY> -->
+
 ## 1.0.0
 
 ### New Features
