@@ -68,9 +68,21 @@ const plugin: JupyterFrontEndPlugin<void> = {
   autoStart: true,
   requires: [IEnvSync],
   activate: async (app: JupyterFrontEnd, envSync: IEnvSync) => {
-    await envSync.setVar('my-minio-extension', 'MINIO_ENDPOINT', 'https://minio.example.com');
-    await envSync.setVar('my-minio-extension', 'MINIO_ACCESS_KEY', 'my-access-key');
-    await envSync.setVar('my-minio-extension', 'MINIO_ACCESS_SECRET', 'my-secret-key');
+    await envSync.setVar(
+      'my-minio-extension',
+      'MINIO_ENDPOINT',
+      'https://minio.example.com'
+    );
+    await envSync.setVar(
+      'my-minio-extension',
+      'MINIO_ACCESS_KEY',
+      'my-access-key'
+    );
+    await envSync.setVar(
+      'my-minio-extension',
+      'MINIO_ACCESS_SECRET',
+      'my-secret-key'
+    );
 
     // All running kernels now have these variables in os.environ.
     // New kernels pick them up automatically via the IPython startup hook.
