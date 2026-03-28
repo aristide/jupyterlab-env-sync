@@ -7,13 +7,19 @@ MARKER = '# jupyterlab-env-sync auto-generated'
 
 PYTHON_STARTUP = '''\
 # jupyterlab-env-sync auto-generated — DO NOT EDIT
-import json as _json, os as _os
+import json as _json, os as _os, sys as _sys
 _p = _os.path.join(_os.environ.get('JUPYTER_RUNTIME_DIR', '/tmp'), 'jupyter_env_overrides.json')
 if _os.path.exists(_p):
+    _SECRET_PATTERNS = ('SECRET', 'PASSWORD', 'TOKEN', 'PRIVATE_KEY')
     with open(_p) as _f:
         for _k, _v in _json.load(_f).items():
-            _os.environ[_k] = _v['value']
-del _json, _os, _p
+            _val = _v['value'] if isinstance(_v, dict) else _v
+            _os.environ[_k] = _val
+            _masked = any(_s in _k.upper() for _s in _SECRET_PATTERNS)
+            _display = '****' if _masked else _val
+            print(f'[env-sync] {_k}={_display}', file=_sys.stderr)
+    del _SECRET_PATTERNS
+del _json, _os, _sys, _p
 '''
 
 R_STARTUP = '''\

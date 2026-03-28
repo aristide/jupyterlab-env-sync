@@ -58,6 +58,28 @@ const plugin: JupyterFrontEndPlugin<void> = {
 | `getByExtension`      | `(extId) → Promise<Record<string, string>>` | Variables owned by a specific extension (key-value pairs).            |
 | `resetAllByExtension` | `(extId) → Promise<void>`                   | Reset all variables owned by an extension.                            |
 
+### Example: MinIO credentials
+
+```typescript
+import { IEnvSync } from 'jupyterlab-env-sync';
+
+const plugin: JupyterFrontEndPlugin<void> = {
+  id: 'my-minio-extension:plugin',
+  autoStart: true,
+  requires: [IEnvSync],
+  activate: async (app: JupyterFrontEnd, envSync: IEnvSync) => {
+    await envSync.setVar('my-minio-extension', 'MINIO_ENDPOINT', 'https://minio.example.com');
+    await envSync.setVar('my-minio-extension', 'MINIO_ACCESS_KEY', 'my-access-key');
+    await envSync.setVar('my-minio-extension', 'MINIO_ACCESS_SECRET', 'my-secret-key');
+
+    // All running kernels now have these variables in os.environ.
+    // New kernels pick them up automatically via the IPython startup hook.
+    // Secret values (keys matching SECRET, PASSWORD, TOKEN, PRIVATE_KEY)
+    // are masked in kernel startup log output.
+  }
+};
+```
+
 ### Consumer `package.json`
 
 ```json

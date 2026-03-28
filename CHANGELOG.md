@@ -2,6 +2,24 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 1.1.1
+
+### Bug Fixes
+
+- **Fix startup hook crash with flat JSON overrides** — the IPython startup hook assumed the overrides file always used `{"key": {"value": "..."}}` format, but plain `{"key": "value"}` entries caused a `TypeError` that prevented all startup hooks from running. The hook now handles both formats.
+
+### Enhancements
+
+- **Secret masking in startup logs** — environment variables with names containing `SECRET`, `PASSWORD`, `TOKEN`, or `PRIVATE_KEY` are now masked as `****` in kernel startup log output
+
+### Tests
+
+- Added unit tests for startup hook installation, env var loading, and secret masking patterns
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
+<!-- <START NEW CHANGELOG ENTRY> -->
+
 ## 1.1.0
 
 ### Enhancements
